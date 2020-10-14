@@ -1,0 +1,17 @@
+{
+  "name": "youtube-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "TheMinecrafter05",
+  "license": "ISC",
+  "dependencies": {
+    "ascii-art": "^2.5.0",
+    "discord.js": "^12.2.0",
+    "fs": "0.0.1-security",
+    "reaction-role": "^2.1.6"
+  }
+}
