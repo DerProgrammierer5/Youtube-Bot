@@ -621,6 +621,39 @@ bot.on("message", async message =>{
             if(err) console.log(err);
         })
     }
+    
+    
+    if(message.content === "!verify"){
+
+        message.channel.send("Klicke auf den 👍 um dich zu verifizieren und auf den 👎 um es abzubrechen.").then(msg=>{
+
+            msg.react("👍").then(()=>{
+                msg.react("👎");
+            });
+
+            const filter = (reaction, user) =>{
+                return ["👍","👎"].includes(reaction.emoji.name) && user.id === message.author.id;
+            }
+
+            msg.awaitReactions(filter,{time:30000, max:1}).then(collected=>{
+                const reaction = collected.first();
+
+                switch(reaction.emoji.name){
+                    case "👍": message.channel.send("Du wurdest verifiziert!");
+                            reaction.users.remove(message.author);
+                        break;
+                    case "👎": message.channel.send("Vorgang abgebrochen");
+                        reaction.users.remove(message.author);
+                        break;
+                }
+
+            }).catch(err=>{
+                if(err) message.channel.send("Zeit ist um!");
+            })
+
+        })
+
+    }
 
 })
 
