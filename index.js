@@ -1,9 +1,10 @@
 const Discord = require("discord.js");
 const bot = new Discord.Client();
-const token =  /*weg xd*/
+const token = "gibts nicht"
 const fs = require("fs");
 const coinfile = require("./coins.json");
 const xpfile = require("./xp.json")
+const warnFile = require("./warns.json")
 const serverstats = require("./servers.json");
 const ascii = require("ascii-art");
 
@@ -58,6 +59,7 @@ bot.on("message", async message =>{
         serverstats[message.guild.id] = {
             prefix:"!",
             welcomechannel:"nochannel",
+            globalchat:"noID"
         }
     }
 
@@ -66,6 +68,18 @@ bot.on("message", async message =>{
             console.log(err);
         }
     })
+
+    if(!warnFile[message.author.id+message.guild.id]){
+        warnFile[message.author.id+message.guild.id] = {
+            warns:0,
+            maxwarn:3
+        }
+    }
+
+    fs.writeFile("./warns.json", JSON.stringify(warnFile), function(err){
+        if(err) console.log(err)
+    })
+
 
     let prefix = serverstats[message.guild.id].prefix;
 
@@ -406,20 +420,53 @@ bot.on("message", async message =>{
 
     //global chat
 
-        if(message.channel.name == "global" && !message.author.bot){
-            bot.guilds.cache.forEach(guild=>{
-                if(guild == message.guild) return;
-                let channel = guild.channels.cache.find(ch=>ch.name === "global");
-                if(!channel) return;
-                let embed = new Discord.MessageEmbed()
-                .setAuthor(message.author.tag +" | Global Chat")
-                .setColor("RANDOM")
-                .setDescription(message.content)
-                .setFooter("Server: "+message.guild.name)
-                .setTimestamp()
-                channel.send(embed)
-            })
+    //setup
+
+    if(message.content.startsWith(prefix+"globalsetup")){
+        let channel = message.mentions.channels.first();
+        if(!channel) return message.channel.send("Du hast keinen Kanal aneggeben.").then(msg=>msg.delete({timeout:"5000"}));
+        if(!message.member.hasPermission("MANAGE_CHANNELS")) return message.channel.send("Du hast keien Rechte dafür.").then(msg=>msg.delete({timeout:"5000"}));
+        if(!serverstats[message.guild.id].globalchat){
+            serverstats[message.guild.id].globalchat = "noID"
         }
+        serverstats[message.guild.id].globalchat = channel.id;
+        message.channel.send("Der Globalchat ist nun <#"+channel.id+">.").then(msg=>msg.delete({timeout:"8000"}));
+    }
+
+    //unsetup
+
+    if(message.content.startsWith(prefix+"globalunsetup")){
+        if(!message.member.hasPermission("MANAGE_CHANNELS")) return message.channel.send("Du hast keien Rechte dafür.").then(msg=>msg.delete({timeout:"5000"}));
+        if(!serverstats[message.guild.id].globalchat){
+            serverstats[message.guild.id].globalchat = "noID"
+        }
+        serverstats[message.guild.id].globalchat = "noID";
+        message.channel.send("Der Globalchat wurde geunsetupped.").then(msg=>msg.delete({timeout:"8000"}));
+    }
+
+    //globalchat
+
+    if(message.channel.id === serverstats[message.guild.id].globalchat && !message.content.startsWith(prefix) && !message.author.bot){
+        bot.guilds.cache.forEach(guild=>{
+            if(guild.id !== message.guild.id){
+                if(serverstats[guild.id].globalchat){
+                    if(serverstats[guild.id].globalchat != "NoID"){
+                        if(guild.channels.cache.get(serverstats[guild.id].globalchat)){
+                            let embed = new Discord.MessageEmbed()
+                            .setAuthor(message.author.tag)
+                            .setTitle("GLOBALCHAT")
+                            .setColor("RANDOM")
+                            .setDescription(message.content)
+                            .setFooter("Guild: "+message.guild.name, message.guild.iconURL())
+                            .setThumbnail(message.author.displayAvatarURL({dynamic:true}))
+                            .setTimestamp()
+                            guild.channels.cache.get(serverstats[guild.id].globalchat).send(embed);
+                        }
+                    }
+                }
+            }
+        })
+    }
 
     //message abwarten
 
@@ -621,8 +668,10 @@ bot.on("message", async message =>{
             if(err) console.log(err);
         })
     }
-    
-    
+
+
+    //reaktionen abwarten
+
     if(message.content === "!verify"){
 
         message.channel.send("Klicke auf den 👍 um dich zu verifizieren und auf den 👎 um es abzubrechen.").then(msg=>{
@@ -653,6 +702,48 @@ bot.on("message", async message =>{
 
         })
 
+    }
+    
+    //warn system
+
+
+    if(message.content.startsWith(prefix+"warn")){
+        let user = message.mentions.users.first();
+        let grund = message.content.split(" ").slice(2).join(" ");
+
+        if(!user) return message.channel.send("Du hast vergessen einen User zu erwähnen.").then(msg=>msg.delete({timeout:"5000"}))
+    
+        if(!grund) grund = "Kein Grund"
+
+        let embed = new Discord.MessageEmbed()
+        .setTitle("Warnung!")
+        .setDescription(`Warnung <@!${user.id}>, du wurdest verwarnt!\nGrund: ${grund}`)
+        .setColor("RED")
+
+        message.channel.send(embed).then(msg=>msg.delete({timeout:"8000"}));
+
+        if(!warnFile[user.id+message.guild.id]){
+            warnFile[user.id+message.guild.id] = {
+                warns:0,
+                maxwarn:3
+            }
+        }
+    
+        warnFile[user.id+message.guild.id].warns += 1
+
+        if(warnFile[user.id+message.guild.id].warns > warnFile[user.id+message.guild.id].maxwarn){
+            if(message.guild.member(user).kickable == true){
+                message.channel.send(`Der user <@!${user.id}> wurde gekickt wegen zu vielen verwarnungen.`)
+                message.guild.member(user).kick("Zu viele verwarnungen.")
+            }
+        
+            delete warnFile[user.id+message.guild.id]
+        }
+
+        fs.writeFile("./warns.json", JSON.stringify(warnFile), function(err){
+            if(err) console.log(err)
+        })
+    
     }
 
 })
