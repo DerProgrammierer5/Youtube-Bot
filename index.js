@@ -6,7 +6,9 @@ const coinfile = require("./coins.json");
 const xpfile = require("./xp.json")
 const warnFile = require("./warns.json")
 const serverstats = require("./servers.json");
+const disbut = require("discord-buttons")
 const ascii = require("ascii-art");
+disbut(bot)
 
 const ranks = ["Player",0,"Premium",100,"VIP",5000, "list"];
 
@@ -746,6 +748,37 @@ bot.on("message", async message =>{
     
     }
 
+    //buttons
+
+    if(message.content == "!button"){
+        let btn = new disbut.MessageButton()
+        .setID("greenButton")
+        .setStyle("green")
+        .setLabel("Grün")
+        .setEmoji("❤")
+
+
+        let btn2 = new disbut.MessageButton()
+        .setID("redButton")
+        .setStyle("red")
+        .setLabel("Rot")
+        .setEmoji("❤")
+
+        let row = new disbut.MessageActionRow()
+        .addComponents(btn,btn2)
+        message.channel.send("hallo",row).then(msg=>{
+            let collector = new disbut.ButtonCollector(msg, button=>button.clicker.id == message.author.id, {max:1,time:2147483647})
+            
+            collector.on("collect", async button=>{
+                if(button.id == "greenButton"){
+                    await button.reply.send("Grün!!!!")
+                }else{
+                    await button.reply.send("Rot!!!!")
+                }
+                button.reply.defer()
+            })
+        })
+    }
 })
 
 bot.on("guildMemberAdd", function(member){
