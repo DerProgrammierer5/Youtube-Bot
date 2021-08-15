@@ -3,4 +3,4 @@
 - npm i fs
 - npm i ascii-art
 
-# Benötigt Node.js Version 16.1.0 oder höher
+# Benötigt Node.js Version 16.1.0 oder höher!
