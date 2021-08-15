@@ -2,6 +2,5 @@
 - npm i discord.js
 - npm i fs
 - npm i ascii-art
-- npm i discord-buttons
 
 # Benötigt Node.js Version 16.1.0 oder höher
