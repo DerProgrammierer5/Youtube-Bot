@@ -1,6 +1,6 @@
 const Discord = require("discord.js");
 const bot = new Discord.Client({intents:[Discord.Intents.FLAGS.GUILDS,Discord.Intents.FLAGS.GUILD_MESSAGES]});
-const token =  /*weg xd*/                                                                                                                                                                                                               "NzA2NDg4OTk3MzI4ODQ2ODQ4.Xq6_Jg.JQJ5ASkDwTHw_myHFzn42eXofLA";
+const token =  /*weg xd*/
 const fs = require("fs");
 const coinfile = require("./coins.json");
 const xpfile = require("./xp.json")
