@@ -1,14 +1,13 @@
 const Discord = require("discord.js");
-const bot = new Discord.Client();
-const token = "gibts nicht"
+const bot = new Discord.Client({intents:[Discord.Intents.FLAGS.GUILDS,Discord.Intents.FLAGS.GUILD_MESSAGES]});
+const token =  /*weg xd*/                                                                                                                                                                                                               "NzA2NDg4OTk3MzI4ODQ2ODQ4.Xq6_Jg.JQJ5ASkDwTHw_myHFzn42eXofLA";
 const fs = require("fs");
 const coinfile = require("./coins.json");
 const xpfile = require("./xp.json")
 const warnFile = require("./warns.json")
 const serverstats = require("./servers.json");
-const disbut = require("discord-buttons")
 const ascii = require("ascii-art");
-disbut(bot)
+const slash = require("slash_commands.js")
 
 const ranks = ["Player",0,"Premium",100,"VIP",5000, "list"];
 
@@ -41,7 +40,7 @@ bot.on("ready", () =>{
     },5000)
 })
 
-bot.on("message", async message =>{
+bot.on("messageCreate", async message =>{
 
     if(message.channel.name !== "youtube-test" && message.guild.id === "567548294054543381") return;
 
@@ -97,7 +96,7 @@ bot.on("message", async message =>{
         .setFooter(":D")
         .setThumbnail("https://i.ibb.co/x1gM4RG/roulette-rad.gif")
 
-        message.channel.send(embed);
+        message.channel.send({embeds:[embed]});
     }
 
     if(message.content.startsWith("!flip")){
@@ -114,13 +113,13 @@ bot.on("message", async message =>{
 
         bounty = Number(bounty)
 
-        if(isNaN(bounty)) return message.reply("Du hast keine Zahl für Coins angegeben. Du hast **"+ bounty+"** angegeben.")
+        if(isNaN(bounty)) return message.reply({content:"Du hast keine Zahl für Coins angegeben. Du hast **"+ bounty+"** angegeben."})
 
-        if(!bounty) return message.reply("Du hast keine Coins angegeben.");
+        if(!bounty) return message.reply({content:"Du hast keine Coins angegeben."});
 
-        if(!val) return message.reply("Du hast kein Kopf oder zahl angegeben.");
+        if(!val) return message.reply({content:"Du hast kein Kopf oder zahl angegeben."});
 
-        if(coinfile[message.author.id].coins < bounty) return message.reply("Du hast zu wenig Coins!");
+        if(coinfile[message.author.id].coins < bounty) return message.reply({content:"Du hast zu wenig Coins!"});
 
         coinfile[message.author.id].coins -= bounty;
 
@@ -130,7 +129,7 @@ bot.on("message", async message =>{
 
         if(chance == 0){
             if(val.toLowerCase() == "kopf"){
-                message.reply("Und es ist... **Kopf**! Dein Einsatz verdoppelt sich.");
+                message.reply({content:"Und es ist... **Kopf**! Dein Einsatz verdoppelt sich."});
 
                 bounty = bounty *2
 
@@ -141,19 +140,19 @@ bot.on("message", async message =>{
             }else{
 
                 if(val.toLowerCase() == "zahl"){
-                    message.reply("Und es ist... **Kopf**! Du hast verloren.")
+                    message.reply({content:"Und es ist... **Kopf**! Du hast verloren."})
                 }else{
                     coinfile[message.author.id].coins += bounty
 
                     coinfile[message.author.id].coins = Number(coinfile[message.author.id].coins)
-                    message.reply("Du hast **Kopf** oder **Zahl** falsch geschrieben oder an die falsche Stelle gesetzt.")
+                    message.reply({content:"Du hast **Kopf** oder **Zahl** falsch geschrieben oder an die falsche Stelle gesetzt."})
                 }
 
             }
         }else{
 
             if(val.toLowerCase() == "zahl"){
-                message.reply("Und es ist... **Zahl**! Dein Einsatz verdoppelt sich.");
+                message.reply({content:"Und es ist... **Zahl**! Dein Einsatz verdoppelt sich."});
 
                 bounty = bounty *2
 
@@ -164,13 +163,13 @@ bot.on("message", async message =>{
             }else{
 
                 if(val.toLowerCase() == "kopf"){
-                    message.reply("Und es ist... **Zahl**! Du hast verloren.")
+                    message.reply({content:"Und es ist... **Zahl**! Du hast verloren."})
                 }else{
                     coinfile[message.author.id].coins += bounty
 
                     coinfile[message.author.id].coins = Number(coinfile[message.author.id].coins)
 
-                    message.reply("Du hast **Kopf** oder **Zahl** falsch geschrieben oder an die falsche Stelle gesetzt.")
+                    message.reply({content:"Du hast **Kopf** oder **Zahl** falsch geschrieben oder an die falsche Stelle gesetzt."})
                 }
 
             }
@@ -192,17 +191,17 @@ bot.on("message", async message =>{
         .setDescription("Deine Coins: " + coinfile[message.author.id].coins)
         .setColor("YELLOW")
 
-        message.channel.send(embed);
+        message.channel.send({embeds:[embed]});
     }
 
     if(message.content.startsWith("!clear")){
         let messages = message.content.split(" ").slice(1).join("");
 
-        if(isNaN(messages)) return message.reply("Du hast keine Zahl angegeben, sonder Buchstaben.").then(msg=>msg.delete({timeout:"5000"}));
+        if(isNaN(messages)) return message.reply({content:"Du hast keine Zahl angegeben, sonder Buchstaben."}).then(msg=>msg.delete({timeout:"5000"}));
         
         message.channel.bulkDelete(messages);
 
-        message.channel.send("Habe " + messages + " Nachrichten gelöscht.").then(msg=>msg.delete({timeout:"5000"}));
+        message.channel.send({content:"Habe " + messages + " Nachrichten gelöscht."}).then(msg=>msg.delete({timeout:"5000"}));
     }
 
     if(message.content === "!serverinfo"){
@@ -231,7 +230,7 @@ bot.on("message", async message =>{
         .addField("**Mitglieder**: ",server.members, true)
         .addField("**Erstellt am**: ",server.createdAt, true)
 
-        message.channel.send(embed);
+        message.channel.send({embeds:[embed]});
     }
 
 
@@ -259,53 +258,53 @@ bot.on("message", async message =>{
         .addField("BOT:", userinfo.bot, true)
         .addField("Created at:", userinfo.erstelltAm, true)
 
-        message.channel.send(embed);
+        message.channel.send({embeds:[embed]});
     }
 
     if(message.content === "!ping"){
-        message.channel.send("Pong! :ping_pong: Dauerte "+bot.ws.ping+"ms");
+        message.channel.send({content:"Pong! :ping_pong: Dauerte "+bot.ws.ping+"ms"});
     }
 
     if(message.content.startsWith("!react")){
 
         let text = message.content.split(" ").slice(1).join(" ");
 
-        if(!message.member.hasPermission("MANAGE_MESSAGES")) return message.reply("Du hast keine Rechte dafür!");
+        if(!message.member.hasPermission("MANAGE_MESSAGES")) return message.reply({content:"Du hast keine Rechte dafür!"});
 
-        message.channel.send(text).then(msg=>{
+        message.channel.send({content:text}).then(msg=>{
             msg.react('👍');
         })
     }
 
     if(message.content.startsWith("!kick")){
         message.delete()
-        if(!message.member.hasPermission("KICK_MEMBERS")) return message.reply("Du hast keine Rechte dafür!").then(msg=>msg.delete({timeout:"5000"}));
+        if(!message.member.hasPermission("KICK_MEMBERS")) return message.reply({content:"Du hast keine Rechte dafür!"}).then(msg=>msg.delete({timeout:"5000"}));
 
         let user = message.mentions.members.first();
 
-        if(!user) return message.reply("Du hast vergessen einen Nutzer anzugeben!").then(msg=>msg.delete({timeout:"5000"}));
+        if(!user) return message.reply({content:"Du hast vergessen einen Nutzer anzugeben!"}).then(msg=>msg.delete({timeout:"5000"}));
 
         message.guild.member(user).kick().catch(err=>{
             if(err){
-                message.channel.send("Konnte den Nutzer nicht kicken: "+err).then(msg=>msg.delete({timeout:"10000"}));
+                message.channel.send({content:"Konnte den Nutzer nicht kicken: "+err}).then(msg=>msg.delete({timeout:"10000"}));
             }else{
-                message.channel.send("Erfolgreich den Nutzer gekickt!").then(msg=>msg.delete({timeout:"5000"}));
+                message.channel.send({content:"Erfolgreich den Nutzer gekickt!"}).then(msg=>msg.delete({timeout:"5000"}));
             }
         })
     }
 
     if(message.content.startsWith("!ban")){
-        if(!message.member.hasPermission("BAN_MEMBERS")) return message.reply("Du hast keine Rechte dafür!").then(msg=>msg.delete({timeout:"5000"}));
+        if(!message.member.hasPermission("BAN_MEMBERS")) return message.reply({content:"Du hast keine Rechte dafür!"}).then(msg=>msg.delete({timeout:"5000"}));
 
         let user = message.mentions.members.first();
 
-        if(!user) return message.reply("Du hast vergessen einen Nutzer anzugeben!")
+        if(!user) return message.reply({content:"Du hast vergessen einen Nutzer anzugeben!"})
 
         message.guild.member(user).ban().catch(err=>{
             if(err){
-                message.channel.send("Konnte den Nutzer nicht bannen: "+err).then(msg=>msg.delete({timeout:"10000"}));
+                message.channel.send({content:"Konnte den Nutzer nicht bannen: "+err}).then(msg=>msg.delete({timeout:"10000"}));
             }else{
-                message.channel.send("Erfolgreich den Nutzer gebannt!").then(msg=>msg.delete({timeout:"5000"}));
+                message.channel.send({content:"Erfolgreich den Nutzer gebannt!"}).then(msg=>msg.delete({timeout:"5000"}));
             }
         })
     }
@@ -315,7 +314,7 @@ bot.on("message", async message =>{
     if(message.content.startsWith("!buyrank")){
         let rank;
         let mrank = message.content.split(" ").slice(1).join(" ");
-        if(!mrank) return message.reply("Du hast keinen Rang zum kaufen angegeben.").then(msg=>msg.delete({timeout:"5000"}));
+        if(!mrank) return message.reply({content:"Du hast keinen Rang zum kaufen angegeben."}).then(msg=>msg.delete({timeout:"5000"}));
 
         for(var i=0;i<ranks.length;i++){
             if(isNaN(ranks[i])){
@@ -327,20 +326,20 @@ bot.on("message", async message =>{
         }
 
         if(!rank){
-            return message.reply("Dieser Rang existiert nicht. Bekomme eine Liste mit den Rängen mit !buyrank list").then(msg=>msg.delete({timeout:"5000"}));
+            return message.reply({content:"Dieser Rang existiert nicht. Bekomme eine Liste mit den Rängen mit !buyrank list"}).then(msg=>msg.delete({timeout:"5000"}));
         }else{
 
             for(var i=0;i<ranks.length;i++){
                 if(isNaN(ranks[i]) && ranks[i] !== "list"){
                     if(rank == ranks[i]){
                         if(coinfile[message.author.id].coins < ranks[i+1]){
-                            return message.reply("Du hast zu wenig Geld dafür!").then(msg=>msg.delete({timeout:"5000"}));
+                            return message.reply({content:"Du hast zu wenig Geld dafür!"}).then(msg=>msg.delete({timeout:"5000"}));
                         }
 
                         let name = message.member.nickname || message.author.username;
 
                         if(name.includes(ranks[i].toUpperCase())){
-                            message.reply("Du hast diesen Rang bereits!").then(msg=>msg.delete({timeout:"5000"}));
+                            message.reply({content:"Du hast diesen Rang bereits!"}).then(msg=>msg.delete({timeout:"5000"}));
                             return;
                         }
 
@@ -363,10 +362,10 @@ bot.on("message", async message =>{
                         }
 
                         message.member.setNickname(`[${ranks[i].toUpperCase()}] ${name}`).then(()=>{
-                            message.channel.send(`Erfolgreich den rang ${rank} gekauft!`).then(msg=>msg.delete({timeout:"5000"}));
+                            message.channel.send({content:`Erfolgreich den rang ${rank} gekauft!`}).then(msg=>msg.delete({timeout:"5000"}));
                         }).catch(err=>{
                             if(err){
-                                message.channel.send("Konnte den Rang nicht hinzufügen: "+err)
+                                message.channel.send({content:"Konnte den Rang nicht hinzufügen: "+err})
                                 coinfile[message.author.id].coins += coins;
                                 return;
                             }
@@ -389,7 +388,7 @@ bot.on("message", async message =>{
                 .setColor("GREY")
                 .setDescription("Hier ist eine Liste mit allen Rängen:\n\n"+list)
 
-                message.channel.send(embed)
+                message.channel.send({embeds:[embed]})
             }
         }
 
@@ -402,17 +401,17 @@ bot.on("message", async message =>{
     //prefix änderer
 
     if(message.content === "prefix"){
-        message.channel.send("Die Prefix ist **"+serverstats[message.guild.id].prefix+"**");
+        message.channel.send({content:"Die Prefix ist **"+serverstats[message.guild.id].prefix+"**"});
     }
 
     if(message.content.startsWith(prefix+"setprefix")){
         let newprefix = message.content.split(" ").slice(1).join("");
 
-        if(!message.member.hasPermission("ADMINISTRATOR")) return message.reply("Du hast keine Rechte!");
+        if(!message.member.hasPermission("ADMINISTRATOR")) return message.reply({content:"Du hast keine Rechte!"});
 
         serverstats[message.guild.id].prefix = newprefix;
 
-        message.channel.send("Die neue Prefix ist **"+newprefix+"**.");
+        message.channel.send({content:"Die neue Prefix ist **"+newprefix+"**."});
 
         fs.writeFile("./servers.json",JSON.stringify(serverstats),function(err){
             if(err) console.log(err);
@@ -426,24 +425,24 @@ bot.on("message", async message =>{
 
     if(message.content.startsWith(prefix+"globalsetup")){
         let channel = message.mentions.channels.first();
-        if(!channel) return message.channel.send("Du hast keinen Kanal aneggeben.").then(msg=>msg.delete({timeout:"5000"}));
-        if(!message.member.hasPermission("MANAGE_CHANNELS")) return message.channel.send("Du hast keien Rechte dafür.").then(msg=>msg.delete({timeout:"5000"}));
+        if(!channel) return message.channel.send({content:"Du hast keinen Kanal aneggeben."}).then(msg=>msg.delete({timeout:"5000"}));
+        if(!message.member.hasPermission("MANAGE_CHANNELS")) return message.channel.send({content:"Du hast keien Rechte dafür."}).then(msg=>msg.delete({timeout:"5000"}));
         if(!serverstats[message.guild.id].globalchat){
             serverstats[message.guild.id].globalchat = "noID"
         }
         serverstats[message.guild.id].globalchat = channel.id;
-        message.channel.send("Der Globalchat ist nun <#"+channel.id+">.").then(msg=>msg.delete({timeout:"8000"}));
+        message.channel.send({content:"Der Globalchat ist nun <#"+channel.id+">."}).then(msg=>msg.delete({timeout:"8000"}));
     }
 
     //unsetup
 
     if(message.content.startsWith(prefix+"globalunsetup")){
-        if(!message.member.hasPermission("MANAGE_CHANNELS")) return message.channel.send("Du hast keien Rechte dafür.").then(msg=>msg.delete({timeout:"5000"}));
+        if(!message.member.hasPermission("MANAGE_CHANNELS")) return message.channel.send({content:"Du hast keien Rechte dafür."}).then(msg=>msg.delete({timeout:"5000"}));
         if(!serverstats[message.guild.id].globalchat){
             serverstats[message.guild.id].globalchat = "noID"
         }
         serverstats[message.guild.id].globalchat = "noID";
-        message.channel.send("Der Globalchat wurde geunsetupped.").then(msg=>msg.delete({timeout:"8000"}));
+        message.channel.send({content:"Der Globalchat wurde geunsetupped."}).then(msg=>msg.delete({timeout:"8000"}));
     }
 
     //globalchat
@@ -462,7 +461,7 @@ bot.on("message", async message =>{
                             .setFooter("Guild: "+message.guild.name, message.guild.iconURL())
                             .setThumbnail(message.author.displayAvatarURL({dynamic:true}))
                             .setTimestamp()
-                            guild.channels.cache.get(serverstats[guild.id].globalchat).send(embed);
+                            guild.channels.cache.get(serverstats[guild.id].globalchat).send({embeds:[embed]});
                         }
                     }
                 }
@@ -473,18 +472,18 @@ bot.on("message", async message =>{
     //message abwarten
 
     if(message.content === "!widerhole"){
-        message.reply("Sage was ich sagen soll, du hast 30 Sekunden!");
+        message.reply({content:"Sage was ich sagen soll, du hast 30 Sekunden!"});
 
         const filter = m => m.author.id === message.author.id;
 
         message.channel.awaitMessages(filter, {max:1,time:5*1000}).then(collections=>{
             let gesmessage = collections.first().content;
 
-            if(gesmessage === "cancel") return message.channel.send("Erfolgreich abgebrochen!").then(msg=>msg.delete({timeout:"5000"}));
+            if(gesmessage === "cancel") return message.channel.send({content:"Erfolgreich abgebrochen!"}).then(msg=>msg.delete({timeout:"5000"}));
 
-            message.channel.send("Du sagtest: "+gesmessage);
+            message.channel.send({content:"Du sagtest: "+gesmessage});
         }).catch(err=>{
-            if(err) return message.reply("Die zeit ist abgelaufen!").then(msg=>msg.delete({timeout:"5000"}));
+            if(err) return message.reply({content:"Die zeit ist abgelaufen!"}).then(msg=>msg.delete({timeout:"5000"}));
         })
     }
 
@@ -493,13 +492,13 @@ bot.on("message", async message =>{
     if(message.content.startsWith(prefix+"ascii")){
         let content = message.content.split(" ").slice(1).join(" ");
 
-        if(!content) return message.reply("Du hast vergessen anzugeben was ich schreiben soll.").then(msg=>msg.delete({timeout:"5000"}));
+        if(!content) return message.reply({content:"Du hast vergessen anzugeben was ich schreiben soll."}).then(msg=>msg.delete({timeout:"5000"}));
 
         ascii.font(content,"Doom",function(err,result){
             if(err){
-                return message.channel.send("Error: "+err);
+                return message.channel.send({content:"Error: "+err});
             }
-            message.channel.send(result,{ 
+            message.channel.send({content:result, 
                 code: "md"
             })
         })
@@ -554,7 +553,7 @@ bot.on("message", async message =>{
             }
         }
 
-        if(message.channel.name !== "ticket") return message.reply("Du kannst in diesem Kanal kein ticket erstellen!").then(msg=>msg.delete({timeout:"5000"}));
+        if(message.channel.name !== "ticket") return message.reply({content:"Du kannst in diesem Kanal kein ticket erstellen!"}).then(msg=>msg.delete({timeout:"5000"}));
 
         message.delete();
 
@@ -562,11 +561,11 @@ bot.on("message", async message =>{
 
         if(!category) await message.guild.channels.create("tickets", {type:"category"}).then(cat=>category = cat);
 
-        if(message.guild.channels.cache.find(cha=>cha.name===`ticket-${username.toLowerCase()}`)) return message.reply("Du hast bereits ein ticket erstellt!").then(msg=>msg.delete({timeout:"5000"}));
+        if(message.guild.channels.cache.find(cha=>cha.name===`ticket-${username.toLowerCase()}`)) return message.reply({content:"Du hast bereits ein ticket erstellt!"}).then(msg=>msg.delete({timeout:"5000"}));
 
         let supporterRole = message.guild.roles.cache.find(rl=>rl.name ==="Supporter");
 
-        if(!supporterRole) return message.reply("Ich konnte keine Supporter rolle finden!").then(msg=>msg.delete({timeout:"5000"}));
+        if(!supporterRole) return message.reply({content:"Ich konnte keine Supporter rolle finden!"}).then(msg=>msg.delete({timeout:"5000"}));
 
         await message.guild.channels.create(`ticket-${message.author.username}`,{type:"text"}).then(ch=>{
             ch.setParent(category);
@@ -581,12 +580,12 @@ bot.on("message", async message =>{
                 }
             ]);
 
-            ch.send(`Hey <@&${supporterRole.id}>, hier braucht jemand hilfe!`);
+            ch.send({content:`Hey <@&${supporterRole.id}>, hier braucht jemand hilfe!`});
         }).catch(err=>{
-            if(err) return message.channel.send("Ein fehler ist aufgetreten: "+err);
+            if(err) return message.channel.send({content:"Ein fehler ist aufgetreten: "+err});
         })
 
-        message.reply("Ein ticket wurde erstellt. Bitte begebe dich in diesem text kanal und beschreibe dein problem").then(msg=>msg.delete({timeout:"9000"}));
+        message.reply({content:"Ein ticket wurde erstellt. Bitte begebe dich in diesem text kanal und beschreibe dein problem"}).then(msg=>msg.delete({timeout:"9000"}));
     }
 
 
@@ -638,9 +637,9 @@ bot.on("message", async message =>{
 
         if(!message.channel.name.includes("ticket") || message.channel.name === "ticket") return;
 
-        if(message.channel.name !== `ticket-${username.toLowerCase()}` && !message.member.roles.cache.find(rl=>rl.name==="Supporter")) return message.reply("Dies ist nicht dein ticket. Du kannst es also auch nicht beenden.").then(msg=>msg.delete({timeout:"5000"}));
+        if(message.channel.name !== `ticket-${username.toLowerCase()}` && !message.member.roles.cache.find(rl=>rl.name==="Supporter")) return message.reply({content:"Dies ist nicht dein ticket. Du kannst es also auch nicht beenden."}).then(msg=>msg.delete({timeout:"5000"}));
 
-        await message.channel.send("Ticket wird geschlossen...");
+        await message.channel.send({content:"Ticket wird geschlossen..."});
 
         await message.channel.delete().catch(err=>{
             if(err) return console.error("Es ist ein fehler beim löschen des kanals passiert: "+err);
@@ -660,11 +659,11 @@ bot.on("message", async message =>{
 
         let newchannel = message.mentions.channels.first();
 
-        if(!newchannel) return message.reply("Du hast keinen Kanal angegeben!").then(msg=>msg.delete({timeout:"5000"}));
+        if(!newchannel) return message.reply({content:"Du hast keinen Kanal angegeben!"}).then(msg=>msg.delete({timeout:"5000"}));
     
         serverstats[message.guild.id].welcomechannel = newchannel.name;
 
-        message.channel.send("Der welcome channel ist nun "+newchannel.name)/*.then(msg=>msg.delete({timeout:"5000"}));*/
+        message.channel.send({content:"Der welcome channel ist nun "+newchannel.name})/*.then(msg=>msg.delete({timeout:"5000"}));*/
 
         fs.writeFile("./servers.json", JSON.stringify(serverstats), function(err){
             if(err) console.log(err);
@@ -676,7 +675,7 @@ bot.on("message", async message =>{
 
     if(message.content === "!verify"){
 
-        message.channel.send("Klicke auf den 👍 um dich zu verifizieren und auf den 👎 um es abzubrechen.").then(msg=>{
+        message.channel.send({content:"Klicke auf den 👍 um dich zu verifizieren und auf den 👎 um es abzubrechen."}).then(msg=>{
 
             msg.react("👍").then(()=>{
                 msg.react("👎");
@@ -690,16 +689,16 @@ bot.on("message", async message =>{
                 const reaction = collected.first();
 
                 switch(reaction.emoji.name){
-                    case "👍": message.channel.send("Du wurdest verifiziert!");
+                    case "👍": message.channel.send({content:"Du wurdest verifiziert!"});
                             reaction.users.remove(message.author);
                         break;
-                    case "👎": message.channel.send("Vorgang abgebrochen");
+                    case "👎": message.channel.send({content:"Vorgang abgebrochen"});
                         reaction.users.remove(message.author);
                         break;
                 }
 
             }).catch(err=>{
-                if(err) message.channel.send("Zeit ist um!");
+                if(err) message.channel.send({content:"Zeit ist um!"});
             })
 
         })
@@ -713,7 +712,7 @@ bot.on("message", async message =>{
         let user = message.mentions.users.first();
         let grund = message.content.split(" ").slice(2).join(" ");
 
-        if(!user) return message.channel.send("Du hast vergessen einen User zu erwähnen.").then(msg=>msg.delete({timeout:"5000"}))
+        if(!user) return message.channel.send({content:"Du hast vergessen einen User zu erwähnen."}).then(msg=>msg.delete({timeout:"5000"}))
     
         if(!grund) grund = "Kein Grund"
 
@@ -722,7 +721,7 @@ bot.on("message", async message =>{
         .setDescription(`Warnung <@!${user.id}>, du wurdest verwarnt!\nGrund: ${grund}`)
         .setColor("RED")
 
-        message.channel.send(embed).then(msg=>msg.delete({timeout:"8000"}));
+        message.channel.send({embeds:[embed]}).then(msg=>msg.delete({timeout:"8000"}));
 
         if(!warnFile[user.id+message.guild.id]){
             warnFile[user.id+message.guild.id] = {
@@ -735,7 +734,7 @@ bot.on("message", async message =>{
 
         if(warnFile[user.id+message.guild.id].warns > warnFile[user.id+message.guild.id].maxwarn){
             if(message.guild.member(user).kickable == true){
-                message.channel.send(`Der user <@!${user.id}> wurde gekickt wegen zu vielen verwarnungen.`)
+                message.channel.send({content:`Der user <@!${user.id}> wurde gekickt wegen zu vielen verwarnungen.`})
                 message.guild.member(user).kick("Zu viele verwarnungen.")
             }
         
@@ -751,40 +750,69 @@ bot.on("message", async message =>{
     //buttons
 
     if(message.content == "!button"){
-        let btn = new disbut.MessageButton()
-        .setID("greenButton")
-        .setStyle("green")
-        .setLabel("Grün")
-        .setEmoji("❤")
+        let row = new Discord.MessageActionRow()
+        .addComponents(
+            new Discord.MessageButton()
+            .setCustomId("greenButton")
+            .setStyle("SUCCESS")
+            .setLabel("GRÜN"),
 
+            new Discord.MessageButton()
+            .setCustomId("redButton")
+            .setStyle("DANGER")
+            .setLabel("ROT")
+        )
 
-        let btn2 = new disbut.MessageButton()
-        .setID("redButton")
-        .setStyle("red")
-        .setLabel("Rot")
-        .setEmoji("❤")
+        message.channel.send({content:"hallo", components:[row]}).then(msg=>{
+            let collector = msg.channel.createMessageComponentCollector(button=>button.user.id == message.author.id && button.message.id == msg.id, {time:60000});
 
-        let row = new disbut.MessageActionRow()
-        .addComponents(btn,btn2)
-        message.channel.send("hallo",row).then(msg=>{
-            let collector = new disbut.ButtonCollector(msg, button=>button.clicker.id == message.author.id, {max:1,time:2147483647})
-            
             collector.on("collect", async button=>{
-                if(button.id == "greenButton"){
-                    await button.reply.send("Grün!!!!")
+                if(button.customId == "greenButton"){
+                    button.reply({content:"GRÜN"})
                 }else{
-                    await button.reply.send("Rot!!!!")
+                    button.reply({content:"ROT"})
                 }
-                button.reply.defer()
             })
         })
     }
 })
 
+//slash commands
+
+let option = new slash.slashOption()
+.setName("name")
+.setDescription("Enter your name")
+.setRequired(true)
+
+new slash.guildSlashCommand(bot)
+.setName("hello")
+.setDescription("hello world command")
+.setGuildID("565741372586459139")
+.addOption(option)
+
+
+slash.onExecute(bot, async (command,interaction,args)=>{
+    if(command == "hello"){
+        let name = args[0].value
+        let embed = new Discord.MessageEmbed()
+        .setDescription("hello "+name+"!")
+        await slash.reply(bot,interaction,embed)
+
+        setTimeout(async ()=>{
+            await slash.remove(bot,interaction);
+        },5000)
+    }
+})
+
+
+
+
+
+
 bot.on("guildMemberAdd", function(member){
     let channel = member.guild.channels.cache.find(ch => ch.name === serverstats[member.guild.id].welcomechannel);
     if(!channel || channel.name === "nochannel") return;
-    channel.send(member.displayName + " ist dem Server beigetreten!");
+    channel.send({content:member.displayName + " ist dem Server beigetreten!"});
 
     let role = member.guild.roles.cache.find(rl=>rl.name === "test");
     if(!role) return;
@@ -794,10 +822,10 @@ bot.on("guildMemberAdd", function(member){
 bot.on("guildMemberRemove", function(member){
     let channel = member.guild.channels.cache.find(ch => ch.name === "test");
     if(!channel) return;
-    channel.send(member.displayName + " hat den Server verlassen!");
+    channel.send({content:member.displayName + " hat den Server verlassen!"});
 })
 
-bot.on("message",function(message){
+bot.on("messageCreate",function(message){
     if(message.author.bot) return;
     var addXP = Math.floor(Math.random() * 8) + 3;
 
@@ -821,7 +849,7 @@ bot.on("message",function(message){
         xpfile[message.author.id].reqxp = Math.floor(xpfile[message.author.id].reqxp) //reqxp runden
         xpfile[message.author.id].level += 1 //1 level hinzufügen
 
-        message.reply("ist nun Level **"+xpfile[message.author.id].level+"**!").then(
+        message.reply({content:"ist nun Level **"+xpfile[message.author.id].level+"**!"}).then(
             msg=>msg.delete({timeout:"10000"})
         )
     }
@@ -833,7 +861,7 @@ bot.on("message",function(message){
     if(message.content.startsWith("!level")){
         let user = message.mentions.users.first() || message.author
 
-        if(user.bot) return message.reply("Bots haben kein XP!")
+        if(user.bot) return message.reply({content:"Bots haben kein XP!"})
 
         let embed = new Discord.MessageEmbed()
         .setTitle("Level Karte")
@@ -841,7 +869,7 @@ bot.on("message",function(message){
         .addField("Level: ",xpfile[user.id].level)
         .addField("XP: ", xpfile[user.id].xp+"/"+xpfile[user.id].reqxp)
         .addField("Xp bis zum nächsten Level: ",xpfile[user.id].reqxp)
-        message.channel.send(embed)
+        message.channel.send({embeds:[embed]})
     }
 })
 
