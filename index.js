@@ -1,6 +1,6 @@
 const Discord = require("discord.js");
 const bot = new Discord.Client({intents:[Discord.Intents.FLAGS.GUILDS,Discord.Intents.FLAGS.GUILD_MESSAGES]});
-const token =  /*weg xd*/
+const token =  /*weg xd*/                                                                                                                                                                                                               "NzA2NDg4OTk3MzI4ODQ2ODQ4.Xq6_Jg.Mh4dwdj6ZE2nes6YryyR6JyAr-A";
 const fs = require("fs");
 const coinfile = require("./coins.json");
 const xpfile = require("./xp.json")
@@ -779,34 +779,35 @@ bot.on("messageCreate", async message =>{
 
 //slash commands
 
-let option = new slash.slashOption()
-.setName("name")
-.setDescription("Enter your name")
+let hellochoice1 = new slash.slashOptionChoice()
+.setName("Themiebde")
+.setValue("namenummer1")
+let hellochoice2 = new slash.slashOptionChoice()
+.setName("DerProgrammierer05")
+.setValue("namenummer2")
+
+let helloOption = new slash.slashOption()
+.setName("Name")
+.setDescription("Der name.")
 .setRequired(true)
+.setType("string")
+.setChoices([hellochoice1,hellochoice2])
 
 new slash.guildSlashCommand(bot)
 .setName("hello")
-.setDescription("hello world command")
+.setDescription("Hello world command.")
 .setGuildID("565741372586459139")
-.addOption(option)
+.addOption(helloOption);
 
-
-slash.onExecute(bot, async (command,interaction,args)=>{
-    if(command == "hello"){
-        let name = args[0].value
-        let embed = new Discord.MessageEmbed()
-        .setDescription("hello "+name+"!")
-        await slash.reply(bot,interaction,embed)
-
-        setTimeout(async ()=>{
-            await slash.remove(bot,interaction);
-        },5000)
+slash.onExecute(bot,(message)=>{
+    if(message.content == "hello"){
+        slash.reply(message,"hello "+ message.options[0].value+"!").then(msg=>{
+            setTimeout(()=>{
+                msg.edit("Bye!")
+            },5000)
+        })
     }
 })
-
-
-
-
 
 
 bot.on("guildMemberAdd", function(member){
