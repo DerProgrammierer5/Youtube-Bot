@@ -1014,7 +1014,7 @@ setInterval(()=>{
                     }
                 }
                 
-                let ch = bot.channels.cache.get(g[away][i].channel)"
+                let ch = bot.channels.cache.get(g[away][i].channel)
 
                 if(ch){
                     if(g[away][i].members.length > 0){
